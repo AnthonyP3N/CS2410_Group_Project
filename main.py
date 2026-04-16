@@ -1,5 +1,5 @@
 import pandas as pd
-
+import matplotlib.pyplot as plt
 
 df = pd.read_csv("ZillowCityData.csv")
 
@@ -23,4 +23,14 @@ dallas_city["HomeValue"] = pd.to_numeric(dallas_city["HomeValue"])
 dallas_city = dallas_city.dropna()
 
 print(dallas_city)
+
+# Simple code to print out graph using matplot
+plt.figure(figsize=(12,6))                              # Declares figure size
+plt.plot(dallas_city.index, dallas_city['HomeValue'])   # Sets x axis to year, y axis to HomeValue corresponding to year
+plt.title("Dallas Home Values Over Time")               # Title of graph
+plt.xlabel("Year")                                      # Title of X-axis
+plt.ylabel("Home Value")                                # Title of Y-axis
+plt.grid(True)                                          # Puts graph on grid structure
+plt.show()                                              # Show graph
+
 
