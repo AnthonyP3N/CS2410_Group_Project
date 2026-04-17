@@ -1,5 +1,13 @@
+'''
+Notes
+df = main Zillow dataset (dataframe)
+dallas_city = dallas only columns (dataframe)
+
+'''
+
 import pandas as pd
 import matplotlib.pyplot as plt
+from stats import *
 
 df = pd.read_csv("ZillowCityData.csv")
 
@@ -32,5 +40,23 @@ plt.xlabel("Year")                                      # Title of X-axis
 plt.ylabel("Home Value")                                # Title of Y-axis
 plt.grid(True)                                          # Puts graph on grid structure
 plt.show()                                              # Show graph
+
+print("--- Statistics ---")
+print(f"Mean: ${round(find_mean(dallas_city), 2)}")
+print(f"Median: ${round(find_median(dallas_city), 2)}")
+print(f"Minimum: ${round(find_min(dallas_city), 2)}")
+print(f"Maximum: ${round(find_max(dallas_city), 2)}")
+print(f"Range: ${round(find_range(dallas_city), 2)}")
+print(f"Variance: {find_variance(dallas_city)}")
+print(f"Standard Deviation: {round(find_stdev(dallas_city), 2)}")
+print(f"Skewness: {find_skewness(dallas_city)}")
+print(f"Kurtosis: {find_kurtosis(dallas_city)}")
+
+# example of slicing to view only a range, user input way is below
+# print(find_date_range(dallas_city, "2006", "2008"))
+
+startYear, endYear = get_year_input()
+dateRange = find_date_range(dallas_city, startYear, endYear)
+print_range_of_information(dateRange, startYear, endYear)
 
 
