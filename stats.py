@@ -128,4 +128,39 @@ def trend(df):
 
     plt.show()
 
+def getResidualZScore(df):
+    if isinstance(df, pd.Series):
+        s = df.dropna()
+    else:
+        s = df['HomeValue'].dropna()
 
+    X = np.arange(len(s)).reshape(-1, 1)
+    y = s.values
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    trend = model.predict(X)
+    res = y - trend
+
+    res_z_score = (res - res.mean()) / res.std(ddof=1)
+
+    out = pd.DataFrame({
+        "price": s,
+        "residual_z": res_z_score
+    }, index=s.index)
+
+    return out
+
+def seasonality(df):
+    ResZ = getResidualZScore(df)
+
+    ResZ['month'] = ResZ.index.month
+    monthly_avg_z = ResZ.groupby("month")["residual_z"].mean()
+
+    monthly_avg_z.index = [
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ]
+
+    return monthly_avg_z

@@ -134,3 +134,14 @@ for date, price in outlier_list:
     print(f"{date.date()} | ${price}")
 
 trend(dallas_city)
+
+seasonal_analyze = seasonality(dallas_city)
+
+seasonal_analyze.plot(kind="bar")
+
+plt.title("Average Z-Score by month")
+plt.xlabel("Month")
+plt.ylabel("Average Z-Score")
+plt.axhline(0)  # baseline
+
+plt.show()
