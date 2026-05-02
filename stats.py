@@ -1,3 +1,8 @@
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+import numpy as np
+import matplotlib.pyplot as plt
+
 def find_min(df):
     return df["HomeValue"].min()
 
@@ -63,4 +68,64 @@ def print_range_of_information(subset, start_year, end_year):
     print(f"Median from year {start_year} to {end_year}: ${round(find_median_range(subset), 2)}")
     print(f"The lowest average home price in your range was ${round(find_min_range(subset), 2)}")
     print(f"The highest average home price in your range was ${round(find_max_range(subset), 2)}")
+
+def find_outliers(df):
+    if isinstance(df, pd.Series):
+        s = df.dropna()
+    else:
+        s = df['HomeValue'].dropna()
+
+    X = np.arange(len(s)).reshape(-1, 1)
+    y = s.values
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    trend = model.predict(X)
+    res = y - trend
+
+    res_z_score = (res - res.mean()) / res.std(ddof=1)
+
+    out = pd.DataFrame({
+        "price": s,
+        "residual_z": res_z_score
+    }, index=s.index)
+
+    outliers = out[out["residual_z"].abs() > 1.62]
+
+    result = list(zip(outliers.index, outliers["price"]))
+    return result
+
+def trend(df):
+    if isinstance(df, pd.Series):
+        s = df.dropna()
+    else:
+        s = df["HomeValue"].dropna()
+
+    s = s.sort_index()
+
+    X = np.arange(len(s)).reshape(-1, 1)
+    y = s.values
+
+    model = LinearRegression()
+    model.fit(X, y)
+
+    trend = model.predict(X)
+
+    plt.figure(figsize=(10, 5))
+
+    # Actual prices
+    plt.plot(s.index, y, label="Actual Prices")
+
+    # Trend line
+    plt.plot(s.index, trend, linestyle="--", label="Trend Line")
+
+    plt.title("Home Prices with Trend Line")
+    plt.xlabel("Date")
+    plt.ylabel("Price")
+    plt.legend()
+    plt.grid()
+
+    plt.show()
+
 

@@ -8,6 +8,8 @@ dallas_city = dallas only columns (dataframe)
 import pandas as pd
 import matplotlib.pyplot as plt
 from stats import *
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 df = pd.read_csv("ZillowCityData.csv")
 
@@ -55,9 +57,10 @@ print(f"Kurtosis: {find_kurtosis(dallas_city)}")
 # example of slicing to view only a range, user input way is below
 # print(find_date_range(dallas_city, "2006", "2008"))
 
-startYear, endYear = get_year_input()
-dateRange = find_date_range(dallas_city, startYear, endYear)
-print_range_of_information(dateRange, startYear, endYear)
+## Below is function to specify range of years to analyze
+# startYear, endYear = get_year_input()
+# dateRange = find_date_range(dallas_city, startYear, endYear)
+# print_range_of_information(dateRange, startYear, endYear)
 
 # Define upper and lower bounds for the standard inflation range
 UPPER_STANDARD_INFLATION = 5.0
@@ -123,3 +126,11 @@ ax.grid(True, alpha=0.1)
 # Adjust layout to prevent clipping and show the plot graph
 plt.tight_layout()
 plt.show()
+
+outlier_list = find_outliers(dallas_city)
+
+print("\nOutliers:")
+for date, price in outlier_list:
+    print(f"{date.date()} | ${price}")
+
+trend(dallas_city)
