@@ -37,7 +37,7 @@ plt.figure(figsize=(12,6))                              # Declares figure size
 plt.plot(dallas_city.index, dallas_city['HomeValue'])   # Sets x axis to year, y axis to HomeValue corresponding to year
 plt.title("Dallas Home Values Over Time")               # Title of graph
 plt.xlabel("Year")                                      # Title of X-axis
-plt.ylabel("Home Value")                                # Title of Y-axis
+plt.ylabel("Home Value ($)")                                # Title of Y-axis
 plt.grid(True)                                          # Puts graph on grid structure
 plt.show()                                              # Show graph
 
@@ -59,4 +59,67 @@ startYear, endYear = get_year_input()
 dateRange = find_date_range(dallas_city, startYear, endYear)
 print_range_of_information(dateRange, startYear, endYear)
 
+# Define upper and lower bounds for the standard inflation range
+UPPER_STANDARD_INFLATION = 5.0
+LOWER_STANDARD_INFLATION = 3.0
 
+# Calculate year-over-year % change in home values using a 12-month rolling period
+dallas_city["YtoY_rate"] = dallas_city["HomeValue"].pct_change(periods=12) * 100
+
+
+#---------------------Inflation Graphs---------------------------- 
+
+# Create figure and axes with a wide layout for readability
+fig, ax = plt.subplots(figsize=(14, 6))
+
+# Plot the year-to-year inflation rate as an orange line
+ax.plot(dallas_city.index, dallas_city["YtoY_rate"], color="orange", linewidth=2, label="Year to Year % Change")
+
+# Draw dashed horizontal lines marking the upper and lower standard inflation bounds
+ax.axhline(y=UPPER_STANDARD_INFLATION, color="darkred", linewidth=1.4, linestyle="--", label=f"Standard Inflation Rate ({UPPER_STANDARD_INFLATION}%)")
+ax.axhline(y=LOWER_STANDARD_INFLATION, color="darkred", linewidth=1.4, linestyle="--", label=f"Standard Inflation Rate ({LOWER_STANDARD_INFLATION}%)")
+
+# Draw a solid baseline at y=0 to visually separate growth from deflation
+ax.axhline(y=0, color="black", linewidth=0.8, linestyle="-")
+
+# Highlight in red where inflation exceeds the upper standard (high inflation rates)
+ax.fill_between(dallas_city.index,
+                dallas_city["YtoY_rate"],
+                UPPER_STANDARD_INFLATION,
+                where=(dallas_city["YtoY_rate"] > UPPER_STANDARD_INFLATION),
+                color="red", alpha=0.2, label="Above Standard")
+
+# Highlight in orange where inflation is positive but below the lower standard (below standard inflation rate)
+ax.fill_between(dallas_city.index,
+                dallas_city["YtoY_rate"],
+                LOWER_STANDARD_INFLATION,
+                where=(dallas_city["YtoY_rate"] < LOWER_STANDARD_INFLATION) & (dallas_city["YtoY_rate"] > 0),
+                color="orange", alpha=0.2, label="Below Standard, Above Zero")
+
+# Highlight in green where inflation falls within the standard inflation range (3%–5%)
+ax.fill_between(dallas_city.index,
+                dallas_city["YtoY_rate"],
+                UPPER_STANDARD_INFLATION,
+                where=(dallas_city["YtoY_rate"] >= 3.0) & (dallas_city["YtoY_rate"] <= UPPER_STANDARD_INFLATION),
+                color="green", alpha=0.2, label="Standard Inflation Rate")
+
+# Highlight in blue where inflation is negative, indicating home value deflation
+ax.fill_between(dallas_city.index,
+                dallas_city["YtoY_rate"], 0,
+                where=(dallas_city["YtoY_rate"] < 0),
+                color="blue", alpha=0.2, label="Deflation (Below 0%)")
+
+# Set graph title and axis labels
+ax.set_title("Dallas Home Value Inflation Rate (Year-to-Year % Change)")
+ax.set_xlabel("Year")
+ax.set_ylabel("Inflation Rate (%)")
+
+# Place the legend in the upper left to avoid overlapping the data
+ax.legend(loc="upper left")
+
+# Add a subtle grid for easier value estimation
+ax.grid(True, alpha=0.1)
+
+# Adjust layout to prevent clipping and show the plot graph
+plt.tight_layout()
+plt.show()
