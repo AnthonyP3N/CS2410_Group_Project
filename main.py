@@ -145,3 +145,8 @@ plt.ylabel("Average Z-Score")
 plt.axhline(0)  # baseline
 
 plt.show()
+
+cagr = cagr_comp(dallas_city['HomeValue'])
+print(f"Average yearly home price inflation: {cagr:.2%}")
+print(f"Average inflation from 2005-2025: 2.5%")
+print(f"Factor of home / general inflation: {cagr * 100 / 2.5 :.2f}")

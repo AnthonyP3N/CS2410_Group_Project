@@ -164,3 +164,14 @@ def seasonality(df):
     ]
 
     return monthly_avg_z
+
+def cagr_comp(df):
+    s = df.dropna().sort_index()
+
+    start = s.iloc[0]
+    end = s.iloc[-1]
+
+    years = (s.index[-1] - s.index[0]).days / 365.25
+
+    cagr = (end / start) ** (1 / years) - 1
+    return cagr
