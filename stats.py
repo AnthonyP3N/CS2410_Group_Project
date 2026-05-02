@@ -93,7 +93,7 @@ def find_outliers(df):
 
     outliers = out[out["residual_z"].abs() > 1.62]
 
-    result = list(zip(outliers.index, outliers["price"]))
+    result = list(zip(outliers.index, outliers["price"], outliers["residual_z"]))
     return result
 
 def trend(df):

@@ -130,8 +130,8 @@ plt.show()
 outlier_list = find_outliers(dallas_city)
 
 print("\nOutliers:")
-for date, price in outlier_list:
-    print(f"{date.date()} | ${price}")
+for date, price, Zscore in outlier_list:
+    print(f"{date.date()} | ${price} | {Zscore:.2f}")
 
 trend(dallas_city)
 
