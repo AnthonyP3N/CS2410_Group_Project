@@ -123,6 +123,7 @@ ax.legend(loc="upper left")
 # Add a subtle grid for easier value estimation
 ax.grid(True, alpha=0.1)
 
+
 # Adjust layout to prevent clipping and show the plot graph
 plt.tight_layout()
 plt.show()
@@ -150,3 +151,81 @@ cagr = cagr_comp(dallas_city['HomeValue'])
 print(f"Average yearly home price inflation: {cagr:.2%}")
 print(f"Average inflation from 2005-2025: 2.5%")
 print(f"Factor of home / general inflation: {cagr * 100 / 2.5 :.2f}")
+
+
+
+# ---------- Bar Chart ----------
+
+# Categorize each monthly reading into one of four inflation zones
+deflation_rates      = (dallas_city["YtoY_rate"] < 0)
+below_standard_rates = (dallas_city["YtoY_rate"] > 0) & (dallas_city["YtoY_rate"] < LOWER_STANDARD_INFLATION)
+standard_rates       = (dallas_city["YtoY_rate"] >= LOWER_STANDARD_INFLATION) & (dallas_city["YtoY_rate"] <= UPPER_STANDARD_INFLATION)
+above_standard_rates = (dallas_city["YtoY_rate"] > UPPER_STANDARD_INFLATION)
+
+# Build a dictionary with category labels as keys and month counts as values
+inflation_categories = {
+    "Deflation\n(< 0%)":       deflation_rates.sum(),
+    "Below Standard\n(0-3%)":  below_standard_rates.sum(),
+    "Standard\n(3-5%)":        standard_rates.sum(),
+    "Above Standard\n(> 5%)":  above_standard_rates.sum(),
+}
+
+# Create bar chart from dictionary
+plt.figure(figsize=(10, 6))
+plt.bar(inflation_categories.keys(), inflation_categories.values(), color=["blue", "orange", "green", "red"], alpha=0.7, edgecolor="black")
+
+# Label each bar with its count
+for i, (label, count) in enumerate(inflation_categories.items()):
+    plt.text(i, count + 0.3, str(count), ha="center", va="bottom", fontweight="bold")
+
+plt.title("Dallas Home Value Inflation — Months per Category")
+plt.xlabel("Inflation Category")
+plt.ylabel("Number of Months")
+plt.grid(axis="y", alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# ---------- Overlapping Graph ----------
+
+fig, ax1 = plt.subplots(figsize=(14, 6))
+
+# Plot home values on the left y-axis in blue
+ax1.plot(dallas_city.index, dallas_city["HomeValue"], color="blue", linewidth=2, label="Home Value ($)")
+ax1.set_xlabel("Year")
+ax1.set_ylabel("Home Value ($)", color="black")
+ax1.tick_params(axis="y", labelcolor="black")
+
+# Create a second y-axis sharing the same x-axis for the inflation rate
+ax2 = ax1.twinx()
+ax2.plot(dallas_city.index, dallas_city["YtoY_rate"], color="purple", linewidth=1.0, linestyle="--", label="Inflation Rate")
+ax2.axhline(y=0, color="black", linewidth=1.0, linestyle="--")
+ax2.set_ylabel("Inflation Rate (%)", fontweight = "bold", color="purple")
+ax2.tick_params(axis="y", labelcolor="purple")
+
+
+# Fill green where inflation is above zero, more generalize for simplicity
+ax2.fill_between(dallas_city.index,
+                 dallas_city["YtoY_rate"],
+                 0,
+                 where=(dallas_city["YtoY_rate"] >= 0),
+                 color="green", alpha=0.4)
+
+
+# Highlight in red where inflation is negative (deflation)
+ax2.fill_between(dallas_city.index,
+                dallas_city["YtoY_rate"],
+                0,
+                where=(dallas_city["YtoY_rate"] < 0),
+                color="red", alpha=0.2)
+
+# Combine both legends into one
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2, loc="upper left")
+
+ax1.set_title("Dallas Home Values vs Inflation Rate (Year-to-Year % Change)")
+ax1.grid(True, alpha=0.1)
+
+plt.tight_layout()
+plt.show()
