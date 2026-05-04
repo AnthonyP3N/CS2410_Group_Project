@@ -175,3 +175,9 @@ def cagr_comp(df):
 
     cagr = (end / start) ** (1 / years) - 1
     return cagr
+
+def predict_2026(df):
+    avg_2025 = df["HomeValue"][df.index.year == 2025].mean()
+    growth_rate = cagr_comp(df["HomeValue"])
+    predicted_2026 = avg_2025 * (1 + growth_rate)
+    return predicted_2026

@@ -14,13 +14,14 @@ from sklearn.linear_model import LinearRegression
 df = pd.read_csv("ZillowCityData.csv")
 
 dallas = df[(df["RegionName"] == "Dallas") & (df["State"] == "TX")]
-
 print(dallas)
 
 # Keep only the date/value columns
 date_columns = df.columns[8:]   # first 8 columns are metadata in csv file, not needed ex: (RegionName, State, Metro, and so on)
 
+
 dallas_city = dallas[date_columns].T  # Flips rows and columns to be structure dates before value ex: 1/32/2000 96000
+
 dallas_city.columns = ["HomeValue"]   # Name date_columns to home values to reflect the average value of homes for each month 
 
 # Convert index to datetime objects, so from strings to actual datetimes, useful for later when plotting gets introduced
@@ -34,6 +35,8 @@ dallas_city = dallas_city.dropna()
 
 print(dallas_city)
 
+
+
 # Simple code to print out graph using matplot
 plt.figure(figsize=(12,6))                              # Declares figure size
 plt.plot(dallas_city.index, dallas_city['HomeValue'])   # Sets x axis to year, y axis to HomeValue corresponding to year
@@ -42,6 +45,8 @@ plt.xlabel("Year")                                      # Title of X-axis
 plt.ylabel("Home Value ($)")                                # Title of Y-axis
 plt.grid(True)                                          # Puts graph on grid structure
 plt.show()                                              # Show graph
+
+
 
 print("--- Statistics ---")
 print(f"Mean: ${round(find_mean(dallas_city), 2)}")
@@ -128,6 +133,7 @@ ax.grid(True, alpha=0.1)
 plt.tight_layout()
 plt.show()
 
+#--- Outlier(s) ---
 outlier_list = find_outliers(dallas_city)
 
 print("\nOutliers:")
@@ -229,3 +235,8 @@ ax1.grid(True, alpha=0.1)
 
 plt.tight_layout()
 plt.show()
+
+predicted_2026 = predict_2026(dallas_city)
+
+print("\n --- Prediction --- ")
+print(f"Predicted 2026 Average Home Value: ${round(predicted_2026, 2)}")
